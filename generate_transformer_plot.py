@@ -1,19 +1,12 @@
 """
 Generates confusion matrix + ROC curve plots for FT-Transformer and
 TabTransformer, matching the style/location used for your other 5 models.
- 
-Run this AFTER confirming the transformer checkpoints load successfully in
-the dashboard -- this script uses the exact same loading code, so if the
-dashboard can't load them, this won't either.
- 
-Usage:
-    python generate_transformer_plots.py
-"""
+ """
  
 import os
  
 import matplotlib
-matplotlib.use("Agg")  # non-interactive backend, avoids potential Tkinter threading issues
+matplotlib.use("Agg")  
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, roc_curve, roc_auc_score
 from sklearn.preprocessing import label_binarize
@@ -60,7 +53,7 @@ def main():
  
         safe_name = model_name.replace(" ", "_")
  
-        # ---- Confusion Matrix ----
+        # Confusion Matrix 
         cm = confusion_matrix(y_test, preds)
         fig, ax = plt.subplots(figsize=(6, 5))
         disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=CLASS_LABELS)
@@ -71,7 +64,7 @@ def main():
         plt.close()
         print(f"Saved confusion matrix: {safe_name}.png")
  
-        # ---- ROC Curve (one-vs-rest) ----
+        #  ROC Curve (one-vs-rest) 
         plt.figure(figsize=(7, 6))
         for i, label in enumerate(CLASS_LABELS):
             fpr, tpr, _ = roc_curve(y_test_bin[:, i], probas[:, i])
