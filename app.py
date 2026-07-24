@@ -28,9 +28,7 @@ from src.transformer_utils import (
     load_transformer_model, predict_with_transformer
 )
 
-# ------------------------------------------------------------
 # Page setup
-# ------------------------------------------------------------
 
 st.set_page_config(
     page_title="Di",
@@ -42,9 +40,7 @@ CLASS_TONE = {0: "healthy", 1: "prediabetic", 2: "diabetic"}
 
 METRICS_PATH = os.path.join(OUTPUT_DIR, "metrics", "model_metrics.csv")
 
-# ------------------------------------------------------------
-# Design tokens (pastel clinical palette)
-# ------------------------------------------------------------
+# Design tokens 
 
 TONE_COLORS = {
     "healthy":     {"bg": "#DCEEE1", "fg": "#2F6B4F"},
@@ -301,9 +297,7 @@ button[data-testid="stNumberInputStepDown"]:hover {
 st.markdown(CUSTOM_CSS, unsafe_allow_html=True)
 
 
-# ------------------------------------------------------------
 # Small UI helpers
-# ------------------------------------------------------------
 
 def eyebrow(text):
     st.markdown(f'<div class="eyebrow">{text}</div>', unsafe_allow_html=True)
@@ -348,10 +342,7 @@ def bullet_list(items):
     html += "</ul>"
     st.markdown(html, unsafe_allow_html=True)
 
-
-# ------------------------------------------------------------
-# Cached loaders (avoid reloading model/scaler on every interaction)
-# ------------------------------------------------------------
+# Cached loaders 
 
 @st.cache_resource
 def load_model(model_name):
@@ -424,7 +415,7 @@ def compute_classification_report(model_name):
     accuracy = report_dict.pop("accuracy")
 
     report_df = pd.DataFrame(report_dict).transpose().round(3)
-    # support column should read as whole numbers, not decimals
+    
     report_df["support"] = report_df["support"].astype(int)
 
     return report_df, accuracy
@@ -446,7 +437,7 @@ def _get_model_predictions(model_name):
         X_input = X_test
 
     preds = model.predict(X_input)
-    preds = np.array(preds).reshape(-1)  # CatBoost returns shape (n,1)
+    preds = np.array(preds).reshape(-1)  
     probas = model.predict_proba(X_input) if hasattr(model, "predict_proba") else None
 
     return preds, probas, X_test, y_test
@@ -586,10 +577,7 @@ def get_recommendations(top_factors):
 
     return recs[:5]
 
-
-# ------------------------------------------------------------
 # Sidebar navigation
-# ------------------------------------------------------------
 
 st.sidebar.markdown('<div class="nav-title">Diabetes Risk Platform</div>', unsafe_allow_html=True)
 
@@ -619,9 +607,7 @@ if not models_ready:
     st.stop()
 
 
-# ==============================================================
 # PAGE 1 -- PREDICT
-# ==============================================================
 
 if page == "Predict":
 
@@ -737,8 +723,7 @@ if page == "Predict":
         X = input_df.copy()
 
         if is_transformer_model(selected_model_name):
-            # pytorch_tabular models were trained on raw, unscaled features
-            # and return a DataFrame, not a plain array -- normalize it here.
+            
             X_model_input = X
             preds, probas = predict_with_transformer(model, X_model_input, TARGET_COLUMN)
         else:
@@ -750,7 +735,7 @@ if page == "Predict":
                 X_model_input = X
 
             preds = model.predict(X_model_input)
-            preds = np.array(preds).reshape(-1)  # CatBoost returns shape (n,1) instead of (n,)
+            preds = np.array(preds).reshape(-1)  
             probas = model.predict_proba(X_model_input) if hasattr(model, "predict_proba") else None
 
         for row_idx in range(len(X)):
@@ -815,10 +800,7 @@ if page == "Predict":
                         except Exception as e:
                             st.info(f"Explanation unavailable for this row ({e}).")
 
-
-# ==============================================================
 # PAGE 2 -- MODEL COMPARISON
-# ==============================================================
 
 else:
 
