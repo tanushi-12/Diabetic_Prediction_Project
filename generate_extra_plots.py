@@ -1,12 +1,8 @@
 """
 Generates a risk score distribution histogram for every locally-available
-model (i.e. every model with a .pkl file -- the two transformer checkpoints
-are excluded, since they can't reliably run local batch inference the
-same way).
- 
-Usage:
-    python generate_extra_plots.py
-"""
+model 
+""" 
+
  
 import os
  
@@ -36,8 +32,6 @@ def compute_risk_score(proba_row):
  
  
 def get_all_local_models():
-    """Every model in model_metrics.csv that has a .pkl file (excludes the
-    two transformer checkpoints, which aren't run through this script)."""
     results_df = pd.read_csv(METRICS_PATH).sort_values("F1 Score", ascending=False)
  
     available = []
@@ -70,7 +64,7 @@ def main():
     if any(name in NEEDS_SCALING for name in model_names):
         scaler = ModelSaver.load_scaler()
  
-    # ---------------- Plot 1: Risk Score Distribution per model ----------------
+    # Plot 1: Risk Score Distribution per model 
  
     for model_name in model_names:
  
