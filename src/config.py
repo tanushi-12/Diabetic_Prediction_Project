@@ -9,7 +9,6 @@ from xgboost import XGBClassifier
 from lightgbm import LGBMClassifier
 from catboost import CatBoostClassifier
  
-# --------------------------------------------------
  
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
  
@@ -29,19 +28,13 @@ TEST_SIZE = 0.20
  
 RANDOM_STATE = 42
  
-# Which models require scaled input (distance/gradient-based models)
 NEEDS_SCALING = {"Logistic Regression", "SVM"}
  
-# Which models require sample_weight passed at fit() time instead of
-# a class_weight constructor arg (XGBoost has no native class_weight)
 NEEDS_SAMPLE_WEIGHT = {"XGBoost"}
  
-# --------------------------------------------------
  
 MODELS = {
  
-    # Tuned via RandomizedSearchCV (see tune_models.py), scored on f1_weighted.
-    # Best f1_weighted found during tuning: 0.6981
     "Logistic Regression":
         LogisticRegression(
             random_state=RANDOM_STATE,
@@ -51,7 +44,7 @@ MODELS = {
             C=0.01
         ),
  
-    # Best f1_weighted found during tuning: 0.7838
+    
     "Random Forest":
         RandomForestClassifier(
             n_estimators=300,
@@ -73,7 +66,7 @@ MODELS = {
             random_state=RANDOM_STATE
         ),
  
-    # Best f1_weighted found during tuning: 0.7934 -- your best sklearn model
+   
     "XGBoost":
         XGBClassifier(
             n_estimators=300,
@@ -87,7 +80,7 @@ MODELS = {
             random_state=RANDOM_STATE
         ),
  
-    # Best f1_weighted found during tuning: 0.7095
+   
     "LightGBM":
         LGBMClassifier(
             n_estimators=200,
@@ -99,7 +92,7 @@ MODELS = {
             verbose=-1
         ),
  
-    # Best f1_weighted found during tuning: 0.6982
+    
     "CatBoost":
         CatBoostClassifier(
             iterations=300,
