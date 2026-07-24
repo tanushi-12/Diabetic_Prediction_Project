@@ -14,7 +14,7 @@ class DataLoader:
  
         self.data = pd.read_csv(DATA_PATH)
  
-        print("✅ Dataset Loaded Successfully!\n")
+        print(" Dataset Loaded Successfully!\n")
  
         return self.data
  
@@ -56,7 +56,7 @@ class DataLoader:
  
         after = self.data.shape[0]
  
-        print("\n🧹 Removing Duplicate Records...")
+        print("\n Removing Duplicate Records...")
  
         print(f"Rows Before : {before}")
  
