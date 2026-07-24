@@ -1,9 +1,4 @@
 
-# Human-readable options for the Streamlit manual-entry form, mapped to
-# the numeric codes the CDC BRFSS2015 dataset (and therefore the trained
-# models) actually expect. Keys are feature column names; values are
-# {numeric_code: display_label}.
- 
 BINARY_YES_NO = {0: "No", 1: "Yes"}
  
 FIELD_OPTIONS = {
@@ -67,8 +62,7 @@ FIELD_OPTIONS = {
     },
 }
  
-# Extra context shown as a hover tooltip next to the field label,
-# so the dropdown options themselves stay a clean "Yes"/"No".
+
 FIELD_HELP = {
     "CholCheck": "Cholesterol check in the past 5 years",
     "Smoker": "Smoked at least 100 cigarettes in your lifetime",
@@ -82,7 +76,7 @@ FIELD_HELP = {
     "HeartDiseaseorAttack": "History of coronary heart disease or heart attack",
 }
  
-# Continuous / count fields -> (min, max, default, step, help_text)
+
 CONTINUOUS_FIELDS = {
     "BMI": (10.0, 70.0, 27.0, 0.5, "Body Mass Index"),
     "MentHlth": (0, 30, 0, 1, "Days of poor mental health in past 30 days"),
