@@ -62,7 +62,7 @@ def extract_fields_from_report(uploaded_file):
     if chol_raw:
         extracted["HighChol"] = 1 if int(chol_raw) >= 200 else 0
  
-    # ---- Smoking status -> Smoker ----
+    
     if re.search(r"smoking status[:\s]+(current|smoker|yes)", text, re.IGNORECASE):
         extracted["Smoker"] = 1
     elif re.search(r"smoking status[:\s]+(never|non[- ]?smoker|no)", text, re.IGNORECASE):
