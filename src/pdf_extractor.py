@@ -5,7 +5,7 @@ import pdfplumber
  
  
 def extract_text_from_pdf(uploaded_file):
-    """Extract raw text from all pages of an uploaded PDF file-like object."""
+    
     text = ""
     with pdfplumber.open(uploaded_file) as pdf:
         for page in pdf.pages:
@@ -16,7 +16,7 @@ def extract_text_from_pdf(uploaded_file):
  
  
 def _search(patterns, text, group=1):
-    """Try a list of regex patterns in order, return the first match found."""
+   
     for pattern in patterns:
         match = re.search(pattern, text, re.IGNORECASE)
         if match:
@@ -25,38 +25,31 @@ def _search(patterns, text, group=1):
  
  
 def extract_fields_from_report(uploaded_file):
-    """
-    Best-effort extraction of known model fields from a lab/health report PDF.
- 
-    Returns (extracted: dict, found_fields: list, missing_fields: list).
-    Only fields that commonly appear in a real report are attempted --
-    things like Education/Income essentially never appear in a clinical
-    report, so those are always left for manual entry.
-    """
+    
  
     text = extract_text_from_pdf(uploaded_file)
  
     extracted = {}
  
-    # ---- Age ----
+ 
     age_raw = _search([r"age[:\s]+(\d{1,3})"], text)
     if age_raw:
         age_years = int(age_raw)
-        # Map real age in years -> CDC BRFSS 13-level age bracket code
+        
         bracket = min(13, max(1, (age_years - 18) // 5 + 1)) if age_years >= 18 else 1
         extracted["Age"] = bracket
  
-    # ---- Sex ----
+   
     sex_raw = _search([r"sex[:\s]+(male|female)", r"gender[:\s]+(male|female)"], text)
     if sex_raw:
         extracted["Sex"] = 1 if sex_raw.lower() == "male" else 0
  
-    # ---- BMI ----
+    
     bmi_raw = _search([r"bmi[:\s]+(\d{1,2}\.?\d?)"], text)
     if bmi_raw:
         extracted["BMI"] = float(bmi_raw)
  
-    # ---- Blood Pressure -> HighBP ----
+   
     bp_raw = _search([r"blood pressure[:\s]+(\d{2,3})\s*/\s*(\d{2,3})"], text, group=0)
     if bp_raw:
         nums = re.findall(r"\d{2,3}", bp_raw)
@@ -64,7 +57,7 @@ def extract_fields_from_report(uploaded_file):
             systolic, diastolic = int(nums[0]), int(nums[1])
             extracted["HighBP"] = 1 if (systolic >= 130 or diastolic >= 80) else 0
  
-    # ---- Cholesterol -> HighChol ----
+   
     chol_raw = _search([r"(?:total )?cholesterol[:\s]+(\d{2,3})"], text)
     if chol_raw:
         extracted["HighChol"] = 1 if int(chol_raw) >= 200 else 0
@@ -75,13 +68,13 @@ def extract_fields_from_report(uploaded_file):
     elif re.search(r"smoking status[:\s]+(never|non[- ]?smoker|no)", text, re.IGNORECASE):
         extracted["Smoker"] = 0
  
-    # ---- Physical activity ----
+   
     if re.search(r"physical activity[:\s]+(yes|active|regular)", text, re.IGNORECASE):
         extracted["PhysActivity"] = 1
     elif re.search(r"physical activity[:\s]+(no|sedentary|none)", text, re.IGNORECASE):
         extracted["PhysActivity"] = 0
  
-    # ---- Heart disease / stroke (must distinguish positive vs negated mentions) ----
+    
     if re.search(r"heart (disease|attack)[:\s]*(yes|positive|history of|present)", text, re.IGNORECASE) \
             or re.search(r"history of (heart disease|myocardial infarction|heart attack)", text, re.IGNORECASE):
         extracted["HeartDiseaseorAttack"] = 1
