@@ -53,24 +53,19 @@ def _get_explainer(model_name, model, X_background):
     if model_name == "Logistic Regression":
         return shap.LinearExplainer(model, X_background)
  
-    # Fallback for anything else (e.g. SVM) -- slower but model-agnostic
+   
     return shap.KernelExplainer(model.predict_proba, shap.sample(X_background, 100))
  
  
 def generate_shap_plots(model_name, model, X_background, X_sample, class_index=2, sample_row=0):
-    """
-    Generates a SHAP summary plot (global) and a waterfall plot (single
-    prediction). class_index=2 -> "Diabetic" class by default, since that's
-    usually the most clinically important class to explain.
-    """
+    
  
     print(f"\n Generating SHAP explanations for {model_name}...")
  
     explainer = _get_explainer(model_name, model, X_background)
     shap_values = explainer.shap_values(X_sample)
  
-    # Multiclass models return a list of arrays (one per class) OR a single
-    # 3D array depending on the SHAP version / model type -- normalize both.
+
     if isinstance(shap_values, list):
         class_shap_values = shap_values[class_index]
     elif shap_values.ndim == 3:
@@ -80,7 +75,7 @@ def generate_shap_plots(model_name, model, X_background, X_sample, class_index=2
  
     safe_name = _safe_name(model_name)
  
-    # ---- Summary plot (global feature impact) ----
+    
     plt.figure()
     shap.summary_plot(class_shap_values, X_sample, show=False)
     plt.title(f"{model_name} — SHAP Summary (Diabetic class)")
@@ -88,7 +83,6 @@ def generate_shap_plots(model_name, model, X_background, X_sample, class_index=2
     plt.savefig(os.path.join(SHAP_DIR, f"{safe_name}_summary.png"), dpi=300, bbox_inches="tight")
     plt.close()
  
-    # ---- Waterfall plot (single prediction explanation) ----
     try:
         expected_value = explainer.expected_value
         if hasattr(expected_value, "__len__") and len(expected_value) > 1:
@@ -113,11 +107,7 @@ def generate_shap_plots(model_name, model, X_background, X_sample, class_index=2
  
  
 def get_top_risk_factors(model_name, model, X_background, X_instance, top_n=4, class_index=2):
-    """
-    Returns the top_n features driving a single prediction toward the
-    given class (default: Diabetic), as a list of (feature_name, shap_value).
-    Used by the Streamlit dashboard to populate 'Top Risk Factors'.
-    """
+    
  
     explainer = _get_explainer(model_name, model, X_background)
     shap_values = explainer.shap_values(X_instance)
