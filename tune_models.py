@@ -1,21 +1,7 @@
 """
 Hyperparameter tuning for the 5 sklearn-compatible models using
-RandomizedSearchCV, scored on F1 (weighted) -- matching the metric your
-project actually ranks models by, not accuracy.
+RandomizedSearchCV, scored on F1 (weighted)
  
-Tuning runs on the ORIGINAL (pre-SMOTE) training set with class_weight/
-auto_class_weights="balanced" already active. This keeps tuning fast --
-SMOTE would roughly triple the training set size, making a proper search
-impractical on a local machine. The tuned hyperparameters found here are
-meant to be copied into src/config.py, where they'll then train on the
-full pipeline (SMOTE + tuned params together) in main.py.
- 
-Usage:
-    python tune_models.py
- 
-Expect this to take a while (rough estimate: 15-40+ minutes total across
-all 5 models, depending on your machine) -- it's doing real cross-validated
-search, not a quick single fit.
 """
  
 from sklearn.model_selection import RandomizedSearchCV
@@ -68,10 +54,8 @@ def main():
  
     results = {}
  
-    # ---------------- Logistic Regression (needs scaled data) ----------------
-    # solver="saga" removed -- it's an iterative solver that can take many
-    # minutes per fit on 180k+ rows without fully converging. lbfgs is much
-    # faster and performs just as well at this dataset size.
+    #  Logistic Regression 
+   
     results["Logistic Regression"] = tune(
         "Logistic Regression",
         LogisticRegression(class_weight="balanced", max_iter=1000, solver="lbfgs", random_state=RANDOM_STATE),
@@ -81,7 +65,7 @@ def main():
         X_train_scaled, y_train, n_iter=5
     )
  
-    # ---------------- Random Forest ----------------
+    # Random Forest 
     results["Random Forest"] = tune(
         "Random Forest",
         RandomForestClassifier(class_weight="balanced", random_state=RANDOM_STATE, n_jobs=-1),
@@ -94,9 +78,8 @@ def main():
         X_train, y_train
     )
  
-    # ---------------- XGBoost ----------------
-    # Note: class imbalance handling (sample_weight) is skipped here for
-    # tuning simplicity -- SMOTE will handle imbalance in the final run.
+    #  XGBoost 
+  
     results["XGBoost"] = tune(
         "XGBoost",
         XGBClassifier(
@@ -113,7 +96,7 @@ def main():
         X_train, y_train
     )
  
-    # ---------------- LightGBM ----------------
+    # LightGBM
     results["LightGBM"] = tune(
         "LightGBM",
         LGBMClassifier(class_weight="balanced", random_state=RANDOM_STATE, verbose=-1),
@@ -126,7 +109,7 @@ def main():
         X_train, y_train
     )
  
-    # ---------------- CatBoost ----------------
+    #  CatBoost 
     results["CatBoost"] = tune(
         "CatBoost",
         CatBoostClassifier(auto_class_weights="Balanced", random_state=RANDOM_STATE, verbose=False),
