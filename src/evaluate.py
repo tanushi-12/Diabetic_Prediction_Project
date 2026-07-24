@@ -20,9 +20,7 @@ from sklearn.preprocessing import label_binarize
  
 from src.config import OUTPUT_DIR
  
-# ---------------------------------------------------
 # Output Directories
-# ---------------------------------------------------
  
 CONFUSION_DIR = os.path.join(OUTPUT_DIR, "confusion_matrix")
 METRIC_DIR = os.path.join(OUTPUT_DIR, "metrics")
@@ -35,10 +33,7 @@ for d in (CONFUSION_DIR, METRIC_DIR, COMPARISON_DIR, ROC_DIR):
 CLASS_LABELS = ["Healthy", "Prediabetic", "Diabetic"]
 CLASS_VALUES = [0, 1, 2]
  
-# The metric used to rank models / choose the "best" one.
-# Accuracy is intentionally NOT used here because the target classes
-# are imbalanced (far more "Healthy" than "Prediabetic"/"Diabetic"),
-# so accuracy alone rewards a model for defaulting to the majority class.
+
 RANKING_METRIC = "F1 Score"
  
  
@@ -59,9 +54,9 @@ class Evaluator:
  
         safe_name = self._safe_name(model_name)
  
-        # ----------------------------
+        
         # Predictions
-        # ----------------------------
+        
  
         y_pred = model.predict(X_test)
  
@@ -70,10 +65,7 @@ class Evaluator:
         if hasattr(model, "predict_proba"):
             y_prob = model.predict_proba(X_test)
  
-        # ----------------------------
-        # Metrics (weighted = accounts for class imbalance,
-        # macro = treats every class as equally important)
-        # ----------------------------
+       
  
         accuracy = accuracy_score(y_test, y_pred)
  
@@ -85,9 +77,9 @@ class Evaluator:
         recall_m = recall_score(y_test, y_pred, average="macro", zero_division=0)
         f1_m = f1_score(y_test, y_pred, average="macro", zero_division=0)
  
-        # ----------------------------
+        
         # ROC AUC + ROC Curve
-        # ----------------------------
+     
  
         roc_auc = None
         y_test_bin = label_binarize(y_test, classes=CLASS_VALUES)
@@ -101,7 +93,7 @@ class Evaluator:
                 multi_class="ovr"
             )
  
-            # One-vs-rest ROC curve, one line per class
+            
             plt.figure(figsize=(7, 6))
  
             for i, label in enumerate(CLASS_LABELS):
@@ -117,15 +109,15 @@ class Evaluator:
             plt.savefig(os.path.join(ROC_DIR, f"{safe_name}.png"), dpi=300)
             plt.close()
  
-        # ----------------------------
+        
         # Print Report
-        # ----------------------------
+      
  
         print(classification_report(y_test, y_pred, target_names=CLASS_LABELS, zero_division=0))
  
-        # ----------------------------
+      
         # Confusion Matrix
-        # ----------------------------
+        
  
         cm = confusion_matrix(y_test, y_pred)
  
@@ -143,9 +135,9 @@ class Evaluator:
         plt.savefig(os.path.join(CONFUSION_DIR, f"{safe_name}.png"), dpi=300)
         plt.close()
  
-        # ----------------------------
+     
         # Save Metrics
-        # ----------------------------
+   
  
         self.results.append({
             "Model": model_name,
@@ -159,24 +151,24 @@ class Evaluator:
             "ROC AUC": round(roc_auc, 4) if roc_auc is not None else None
         })
  
-    # -------------------------------------------------
+   
  
     def save_results(self):
  
         results_df = pd.DataFrame(self.results)
  
-        # Ranked by F1 (weighted), NOT accuracy — see RANKING_METRIC note above
+       
         results_df = results_df.sort_values(by=RANKING_METRIC, ascending=False).reset_index(drop=True)
  
         csv_path = os.path.join(METRIC_DIR, "model_metrics.csv")
         results_df.to_csv(csv_path, index=False)
  
         print(f"\nMetrics saved to:\n{csv_path}")
-        print(f"🏆 Best model by {RANKING_METRIC}: {results_df.iloc[0]['Model']}")
+        print(f" Best model by {RANKING_METRIC}: {results_df.iloc[0]['Model']}")
  
-        # ------------------------------------------
+        
         # Comparison Graphs
-        # ------------------------------------------
+        
  
         metrics = [
             "Accuracy",
