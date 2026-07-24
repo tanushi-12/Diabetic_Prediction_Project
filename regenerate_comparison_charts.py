@@ -1,19 +1,12 @@
 """
-Regenerates the Model Comparison bar charts (Accuracy, Precision, Recall,
-F1, ROC AUC) directly from the current outputs/metrics/model_metrics.csv --
-whatever is in that file, including merged-in transformer results, gets
-reflected here. Run this any time you merge new results into the CSV, so
-the charts stay in sync with the table.
- 
-Usage:
-    python regenerate_comparison_charts.py
+Regenerates the Model Comparison bar charts
 """
  
 import os
  
 import pandas as pd
 import matplotlib
-matplotlib.use("Agg")  # non-interactive, avoids Windows Tkinter threading issues
+matplotlib.use("Agg") 
 import matplotlib.pyplot as plt
 import seaborn as sns
  
