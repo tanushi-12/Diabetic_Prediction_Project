@@ -5,10 +5,7 @@ from src.config import MODELS, NEEDS_SCALING, NEEDS_SAMPLE_WEIGHT
 from src.evaluate import Evaluator
 from src.save_models import ModelSaver
  
-# SVC(probability=True) scales ~O(n^2)-O(n^3) with training rows.
-# On large datasets (100k+ rows) it can take hours. Cap the training
-# sample for SVM specifically so it stays a fair comparison point
-# without blocking the rest of the pipeline.
+
 SVM_MAX_TRAIN_ROWS = 15000
  
  
@@ -57,8 +54,7 @@ class ModelTrainer:
                 )
  
             if name in NEEDS_SAMPLE_WEIGHT:
-                # XGBoost has no class_weight param -- pass balanced
-                # sample weights explicitly at fit time instead.
+                
                 sample_weights = compute_sample_weight(class_weight="balanced", y=train_y)
                 model.fit(train_X, train_y, sample_weight=sample_weights)
             else:
